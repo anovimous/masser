@@ -98,14 +98,12 @@ func run() error {
 		cancel()
 	}()
 
-	// Run sequentially across requests; concurrency could be added later as a
-	// flag, but for now staying within the rate limit is the priority and the
-	// limiter inside the client already serialises calls.
 	results := make([]tester.Result, 0, len(requests))
+loop:
 	for _, req := range requests {
 		select {
 		case <-ctx.Done():
-			break
+			break loop
 		default:
 		}
 		results = append(results, t.Run(ctx, req, words))
